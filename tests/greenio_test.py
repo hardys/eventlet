@@ -611,6 +611,30 @@ class TestGreenSocket(LimitedTestCase):
         assert select.select([], [s1], [], 0) == ([], [s1], [])
 
 
+class TestGreenSelect(LimitedTestCase):
+    def test_get_fileno(self):
+        class DummySocket(object):
+            def fileno(self):
+                return 123
+        self.assertEqual(123, select.get_fileno(DummySocket()))
+
+    def test_get_fileno_int(self):
+        self.assertEqual(123, select.get_fileno(123))
+
+    def test_get_fileno_typerr1(self):
+        # FIXME: test the exception detail when the test
+        # base-class provides an assertRaises which supports it
+        self.assertRaises(TypeError, select.get_fileno, 'foo')
+
+    def test_get_fileno_typerr2(self):
+        class DummySocket(object):
+            def fileno(self):
+                return 'foo'
+        # FIXME: test the exception detail when the test
+        # base-class provides an assertRaises which supports it
+        self.assertRaises(TypeError, select.get_fileno, 'foo')
+
+
 class TestGreenPipe(LimitedTestCase):
     @skip_on_windows
     def setUp(self):
